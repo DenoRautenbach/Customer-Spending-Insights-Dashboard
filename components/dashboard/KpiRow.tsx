@@ -1,4 +1,4 @@
-import { DollarSign, Hash, TrendingUp, Tag } from "lucide-react";
+import { Hash, TrendingUp, Tag } from "lucide-react";
 import KpiCard from "./KpiCard";
 import type { SpendingSummary } from "@/types/api";
 
@@ -21,7 +21,7 @@ export default function KpiRow({ summary, isLoading }: KpiRowProps) {
       <KpiCard
         label="Total Spent"
         value={summary ? formatZAR(summary.totalSpent) : "—"}
-        icon={<DollarSign size={16} />}
+        icon={<span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "-0.5px" }}>ZAR</span>}
         delta={summary?.comparedToPrevious.spentChange ?? null}
         deltaLabel="vs prev period"
         isLoading={isLoading}

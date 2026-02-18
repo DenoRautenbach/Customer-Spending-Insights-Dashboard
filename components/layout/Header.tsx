@@ -1,7 +1,7 @@
 "use client";
 
-import { Bell, Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import type { CustomerProfile } from "@/types/api";
 
 type Period = "7d" | "30d" | "90d" | "1y";
@@ -21,15 +21,27 @@ interface HeaderProps {
 }
 
 export default function Header({ profile, isLoading, period, onPeriodChange }: HeaderProps) {
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
+  // Always start as false for consistent server/client initial render
+  const [dark, setDark] = useState(false);
+  // Greeting starts empty; set on client only to avoid server/client mismatch
+  const [greeting, setGreeting] = useState("");
+
+  // Apply saved dark-mode preference before first paint (client only)
+  useLayoutEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
       document.documentElement.classList.add("dark");
-      return true;
+      setDark(true);
     }
-    return false;
-  });
+  }, []);
+
+  // Set time-based greeting on the client only (avoids SSR/CSR mismatch)
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(
+      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
+    );
+  }, []);
 
   function toggleDark() {
     const next = !dark;
@@ -45,10 +57,6 @@ export default function Header({ profile, isLoading, period, onPeriodChange }: H
         year: "numeric",
       })
     : null;
-
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
     <header
@@ -113,13 +121,6 @@ export default function Header({ profile, isLoading, period, onPeriodChange }: H
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        <button
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
-          style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
-          aria-label="Notifications"
-        >
-          <Bell size={16} />
-        </button>
         <button
           onClick={toggleDark}
           className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
