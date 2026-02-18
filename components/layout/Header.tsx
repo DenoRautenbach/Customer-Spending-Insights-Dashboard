@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Menu, Moon, Sun } from "lucide-react";
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { CustomerProfile } from "@/types/api";
 
@@ -18,9 +18,10 @@ interface HeaderProps {
   isLoading?: boolean;
   period: Period;
   onPeriodChange: (p: Period) => void;
+  onMenuToggle: () => void;
 }
 
-export default function Header({ profile, isLoading, period, onPeriodChange }: HeaderProps) {
+export default function Header({ profile, isLoading, period, onPeriodChange, onMenuToggle }: HeaderProps) {
   // Always start as false for consistent server/client initial render
   const [dark, setDark] = useState(false);
   // Greeting starts empty; set on client only to avoid server/client mismatch
@@ -60,70 +61,121 @@ export default function Header({ profile, isLoading, period, onPeriodChange }: H
 
   return (
     <header
-      className="sticky top-0 z-30 flex items-center gap-4 px-6 py-4 border-b"
+      className="sticky top-0 z-30 px-4 md:px-6 border-b"
       style={{
         background: "var(--bg-header)",
         borderColor: "var(--border-subtle)",
       }}
     >
-      {/* Greeting */}
-      <div className="flex-1 min-w-0">
-        {isLoading ? (
-          <div className="space-y-1.5">
-            <div className="skeleton h-5 w-48 rounded" />
-            <div className="skeleton h-3.5 w-32 rounded" />
-          </div>
-        ) : (
-          <>
-            <h1 className="text-base font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-              {greeting}{firstName ? `, ${firstName}` : ""}
-              {profile?.accountType === "premium" && (
-                <span
-                  className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ background: "var(--brand-glow)", color: "var(--brand-accent)" }}
-                >
-                  Premium
-                </span>
+      {/* Row 1 — always visible: burger (mobile) + greeting */}
+      <div className="flex items-center gap-3 py-3 md:py-4">
+        {/* Burger — mobile only */}
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+          style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
+          aria-label="Open navigation"
+        >
+          <Menu size={18} />
+        </button>
+
+        {/* Greeting */}
+        <div className="flex-1 min-w-0">
+          {isLoading ? (
+            <div className="space-y-1.5">
+              <div className="skeleton h-5 w-48 rounded" />
+              <div className="skeleton h-3.5 w-32 rounded" />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-base font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+                {greeting}{firstName ? `, ${firstName}` : ""}
+                {profile?.accountType === "premium" && (
+                  <span
+                    className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full"
+                    style={{ background: "var(--brand-glow)", color: "var(--brand-accent)" }}
+                  >
+                    Premium
+                  </span>
+                )}
+              </h1>
+              {joinDate && (
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Member since {joinDate}
+                </p>
               )}
-            </h1>
-            {joinDate && (
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Member since {joinDate}
-              </p>
-            )}
-          </>
-        )}
-      </div>
+            </>
+          )}
+        </div>
 
-      {/* Period selector */}
-      <div
-        className="flex items-center gap-1 p-1 rounded-xl"
-        style={{ background: "var(--bg-page)" }}
-        role="group"
-        aria-label="Time period selector"
-      >
-        {PERIODS.map(({ label, value }) => (
-          <button
-            key={value}
-            onClick={() => onPeriodChange(value)}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
-            style={{
-              background: period === value ? "var(--bg-card)" : "transparent",
-              color: period === value ? "var(--brand-accent)" : "var(--text-muted)",
-              boxShadow: period === value ? "var(--shadow-card)" : "none",
-            }}
-            aria-pressed={period === value}
+        {/* Period selector + dark toggle — inline on md+, hidden here on mobile */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* Period selector */}
+          <div
+            className="flex items-center gap-1 p-1 rounded-xl"
+            style={{ background: "var(--bg-page)" }}
+            role="group"
+            aria-label="Time period selector"
           >
-            {label}
+            {PERIODS.map(({ label, value }) => (
+              <button
+                key={value}
+                onClick={() => onPeriodChange(value)}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
+                style={{
+                  background: period === value ? "var(--bg-card)" : "transparent",
+                  color: period === value ? "var(--brand-accent)" : "var(--text-muted)",
+                  boxShadow: period === value ? "var(--shadow-card)" : "none",
+                }}
+                aria-pressed={period === value}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {/* Dark toggle */}
+          <button
+            onClick={toggleDark}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
+            style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
+            aria-label="Toggle dark mode"
+          >
+            {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-        ))}
+        </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
+      {/* Row 2 — mobile only: period selector + dark toggle */}
+      <div
+        className="flex md:hidden items-center gap-3 pb-3"
+      >
+        <div
+          className="flex items-center gap-1 p-1 rounded-xl flex-1"
+          style={{ background: "var(--bg-page)" }}
+          role="group"
+          aria-label="Time period selector"
+        >
+          {PERIODS.map(({ label, value }) => (
+            <button
+              key={value}
+              onClick={() => onPeriodChange(value)}
+              className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
+              style={{
+                background: period === value ? "var(--bg-card)" : "transparent",
+                color: period === value ? "var(--brand-accent)" : "var(--text-muted)",
+                boxShadow: period === value ? "var(--shadow-card)" : "none",
+              }}
+              aria-pressed={period === value}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={toggleDark}
-          className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
+          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
           style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
           aria-label="Toggle dark mode"
         >

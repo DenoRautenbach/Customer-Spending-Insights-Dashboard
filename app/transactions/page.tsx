@@ -1,7 +1,7 @@
 export default function TransactionsPage() {
   return (
     <div
-      className="ml-64 min-h-screen flex items-center justify-center"
+      className="lg:ml-64 min-h-screen flex items-center justify-center"
       style={{ background: "var(--bg-page)" }}
     >
       <div className="text-center space-y-3">
