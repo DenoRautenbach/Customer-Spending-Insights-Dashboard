@@ -53,10 +53,10 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
 
       <aside
         className={[
-          "fixed left-0 top-0 h-screen w-64 flex flex-col z-40 border-r",
+          "fixed right-0 lg:left-0 lg:right-auto top-0 h-screen w-64 flex flex-col z-40 border-l lg:border-r lg:border-l-0",
           "transition-transform duration-300 ease-in-out",
           "lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          isOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
         style={{
           background: "#FFFFFF",

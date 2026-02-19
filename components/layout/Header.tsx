@@ -39,21 +39,10 @@ export default function Header({ profile, isLoading, onMenuToggle }: HeaderProps
         borderColor: "var(--border-subtle)",
       }}
     >
-      {/* Semi-transparent frosted overlay — greeting sits on top of the banner */}
+      {/* Greeting row — greeting left, burger right on mobile */}
       <div
         className="flex items-center gap-3 px-4 md:px-6 py-4"
-
       >
-        {/* Burger — mobile only */}
-        <button
-          onClick={onMenuToggle}
-          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-          style={{ background: "rgba(255,255,255,0.6)", color: "var(--text-secondary)" }}
-          aria-label="Open navigation"
-        >
-          <Menu size={18} />
-        </button>
-
         {/* Greeting */}
         <div className="flex-1 min-w-0">
           {isLoading ? (
@@ -85,6 +74,16 @@ export default function Header({ profile, isLoading, onMenuToggle }: HeaderProps
             </>
           )}
         </div>
+
+        {/* Burger — right side, mobile only */}
+        <button
+          onClick={onMenuToggle}
+          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+          style={{ background: "rgba(255,255,255,0.6)", color: "var(--text-secondary)" }}
+          aria-label="Open navigation"
+        >
+          <Menu size={18} />
+        </button>
       </div>
 
       {/* Transparent spacer so the banner image is visible below the frosted bar */}
