@@ -1,0 +1,15 @@
+# Dependencies and build output — handled by Docker stages
+node_modules
+.next
+
+# Dev / tooling
+.git
+.gitignore
+.eslintrc*
+eslint.config.*
+README.md
+
+# Local env files — never bake secrets into the image
+.env
+.env.*
+!.env.example
