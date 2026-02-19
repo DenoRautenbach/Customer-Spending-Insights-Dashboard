@@ -1,18 +1,22 @@
+"use client";
+
+import AppShell from "@/components/layout/AppShell";
+import TransactionsTable from "@/components/dashboard/TransactionsTable";
+
 export default function TransactionsPage() {
   return (
-    <div
-      className="lg:ml-64 min-h-screen flex items-center justify-center"
-      style={{ background: "var(--bg-page)" }}
-    >
-      <div className="text-center space-y-3">
-        <p className="text-4xl">💳</p>
-        <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
-          Transactions
-        </h1>
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Full transaction history coming soon.
-        </p>
+    <AppShell>
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+        <div>
+          <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+            Transactions
+          </h2>
+          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
+            Your full transaction history.
+          </p>
+        </div>
+        <TransactionsTable />
       </div>
-    </div>
+    </AppShell>
   );
 }

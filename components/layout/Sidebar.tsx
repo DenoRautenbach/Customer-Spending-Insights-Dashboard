@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,17 +9,15 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   Target,
-  Settings,
   ChevronRight,
   X,
 } from "lucide-react";
 import type { CustomerProfile } from "@/types/api";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",    href: "/",             icon: LayoutDashboard },
-  { label: "Transactions", href: "/transactions",  icon: ArrowLeftRight  },
-  { label: "Goals",        href: "/goals",         icon: Target          },
-  { label: "Settings",     href: "/settings",      icon: Settings        },
+  { label: "Dashboard",    href: "/#overview",      icon: LayoutDashboard },
+  { label: "Transactions", href: "/#transactions",  icon: ArrowLeftRight  },
+  { label: "Goals",        href: "/#goals",          icon: Target          },
 ];
 
 interface SidebarProps {
@@ -29,6 +29,21 @@ interface SidebarProps {
 
 export default function Sidebar({ profile, isLoading, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const [hash, setHash] = useState("");
+
+  // Track hash changes (client-side only)
+  useEffect(() => {
+    const update = () => setHash(window.location.hash || "#overview");
+    update();
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+
+  const isActive = (href: string) => {
+    if (pathname !== "/") return false;
+    const hrefHash = href.includes("#") ? `#${href.split("#")[1]}` : "#overview";
+    return hash === hrefHash;
+  };
 
   const initials = profile?.name
     .split(" ")
@@ -91,7 +106,7 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin">
           {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-            const active = pathname === href;
+              const active = isActive(href);
             return (
               <Link
                 key={href}
