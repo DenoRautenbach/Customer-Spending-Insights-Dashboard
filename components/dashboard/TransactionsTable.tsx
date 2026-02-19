@@ -59,7 +59,7 @@ export default function TransactionsTable() {
     <div className="card flex flex-col overflow-hidden">
       {/* Table header */}
       <div
-        className="flex items-center justify-between px-5 py-4 border-b"
+        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-5 py-4 border-b"
         style={{ borderColor: "var(--border-subtle)" }}
       >
         <div>
