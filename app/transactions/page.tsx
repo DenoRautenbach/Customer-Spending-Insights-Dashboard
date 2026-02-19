@@ -6,7 +6,7 @@ import TransactionsTable from "@/components/dashboard/TransactionsTable";
 export default function TransactionsPage() {
   return (
     <AppShell>
-      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6 mt-4">
         <div>
           <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
             Transactions

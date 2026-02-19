@@ -29,7 +29,7 @@ export default function Home() {
 
   return (
     <AppShell>
-      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6 mt-4">
 
         {/* ── Period switcher + overview anchor ── */}
         <div id="overview" className="card flex flex-wrap items-center gap-2 p-2">

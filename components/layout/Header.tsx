@@ -1,16 +1,14 @@
 "use client";
 
-import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { CustomerProfile } from "@/types/api";
 
 interface HeaderProps {
   profile: CustomerProfile | null;
   isLoading?: boolean;
-  onMenuToggle: () => void;
 }
 
-export default function Header({ profile, isLoading, onMenuToggle }: HeaderProps) {
+export default function Header({ profile, isLoading }: HeaderProps) {
   const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
@@ -74,16 +72,6 @@ export default function Header({ profile, isLoading, onMenuToggle }: HeaderProps
             </>
           )}
         </div>
-
-        {/* Burger — right side, mobile only */}
-        <button
-          onClick={onMenuToggle}
-          className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-          style={{ background: "rgba(255,255,255,0.6)", color: "var(--text-secondary)" }}
-          aria-label="Open navigation"
-        >
-          <Menu size={18} />
-        </button>
       </div>
 
       {/* Transparent spacer so the banner image is visible below the frosted bar */}

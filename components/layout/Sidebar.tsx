@@ -31,18 +31,21 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
   const pathname = usePathname();
   const [hash, setHash] = useState("");
 
-  // Track hash changes (client-side only)
+  // Initialise from current URL hash on mount only
   useEffect(() => {
-    const update = () => setHash(window.location.hash || "#overview");
-    update();
-    window.addEventListener("hashchange", update);
-    return () => window.removeEventListener("hashchange", update);
+    setHash(window.location.hash || "#overview");
   }, []);
 
   const isActive = (href: string) => {
     if (pathname !== "/") return false;
     const hrefHash = href.includes("#") ? `#${href.split("#")[1]}` : "#overview";
     return hash === hrefHash;
+  };
+
+  const handleNavClick = (href: string) => {
+    const hrefHash = href.includes("#") ? `#${href.split("#")[1]}` : "#overview";
+    setHash(hrefHash);
+    onClose();
   };
 
   const initials = profile?.name
@@ -84,14 +87,20 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
           className="flex items-center justify-between px-5 py-5 border-b"
           style={{ borderColor: "var(--border-card)" }}
         >
-          <Image
-            src="/logo.svg"
-            alt="Capitec"
-            width={110}
-            height={32}
-            priority
-            className="object-contain"
-          />
+          <button
+            onClick={() => window.location.reload()}
+            aria-label="Refresh dashboard"
+            className="focus:outline-none"
+          >
+            <Image
+              src="/logo.svg"
+              alt="Capitec"
+              width={110}
+              height={32}
+              priority
+              className="object-contain"
+            />
+          </button>
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
@@ -111,7 +120,7 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
               <Link
                 key={href}
                 href={href}
-                onClick={onClose}
+                onClick={() => handleNavClick(href)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 group"
                 style={{
                   background: active ? "rgba(47, 112, 239, 0.07)" : "transparent",
