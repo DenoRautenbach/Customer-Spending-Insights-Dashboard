@@ -25,7 +25,7 @@ export default function KpiRow({ summary, isLoading }: KpiRowProps) {
         delta={summary?.comparedToPrevious.spentChange ?? null}
         deltaLabel="vs prev period"
         isLoading={isLoading}
-        accentColor="var(--brand-primary)"
+        accentColor="#2F70EF"
       />
       <KpiCard
         label="Transactions"
@@ -34,7 +34,7 @@ export default function KpiRow({ summary, isLoading }: KpiRowProps) {
         delta={summary?.comparedToPrevious.transactionChange ?? null}
         deltaLabel="vs prev period"
         isLoading={isLoading}
-        accentColor="#8b5cf6"
+        accentColor="#2F70EF"
       />
       <KpiCard
         label="Avg Transaction"
@@ -42,7 +42,7 @@ export default function KpiRow({ summary, isLoading }: KpiRowProps) {
         icon={<TrendingUp size={16} />}
         delta={null}
         isLoading={isLoading}
-        accentColor="#10b981"
+        accentColor="#4111A4"
       />
       <KpiCard
         label="Top Category"
@@ -50,7 +50,7 @@ export default function KpiRow({ summary, isLoading }: KpiRowProps) {
         icon={<Tag size={16} />}
         delta={null}
         isLoading={isLoading}
-        accentColor="#f59e0b"
+        accentColor="#3A3A3A"
       />
     </div>
   );

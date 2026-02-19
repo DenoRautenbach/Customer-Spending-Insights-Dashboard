@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -7,7 +8,6 @@ import {
   ArrowLeftRight,
   Target,
   Settings,
-  TrendingUp,
   ChevronRight,
   X,
 } from "lucide-react";
@@ -42,44 +42,46 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
 
   return (
     <>
-      {/* Mobile backdrop overlay */}
+      {/* Mobile backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
-        style={{ background: "var(--bg-sidebar)" }}
         className={[
-          // Base
-          "fixed left-0 top-0 h-screen w-64 flex flex-col z-40 border-r border-white/10",
-          // Mobile: slide in/out; Desktop: always visible
+          "fixed left-0 top-0 h-screen w-64 flex flex-col z-40 border-r",
           "transition-transform duration-300 ease-in-out",
           "lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
+        style={{
+          background: "#FFFFFF",
+          borderColor: "var(--border-card)",
+        }}
         aria-label="Sidebar navigation"
       >
-        {/* Logo + mobile close button */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-white/10">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-white text-sm shrink-0"
-            style={{ background: "var(--brand-primary)" }}
-          >
-            C
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-sm leading-tight">Capitec</p>
-            <p className="text-white/40 text-xs">Spending Insights</p>
-          </div>
-          <TrendingUp className="text-white/20 hidden lg:block" size={16} />
+        {/* Logo header */}
+        <div
+          className="flex items-center justify-between px-5 py-5 border-b"
+          style={{ borderColor: "var(--border-card)" }}
+        >
+          <Image
+            src="/logo.svg"
+            alt="Capitec"
+            width={110}
+            height={32}
+            priority
+            className="object-contain"
+          />
           {/* Close button — mobile only */}
           <button
             onClick={onClose}
-            className="lg:hidden text-white/50 hover:text-white transition-colors p-1 rounded-lg"
+            className="lg:hidden p-1.5 rounded-lg transition-colors"
+            style={{ color: "var(--text-muted)" }}
             aria-label="Close sidebar"
           >
             <X size={18} />
@@ -87,25 +89,25 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-thin">
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-thin">
           {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
-                onClick={onClose}  // close sidebar on mobile after navigating
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+                onClick={onClose}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 group"
                 style={{
-                  background: active ? "var(--brand-glow)" : "transparent",
-                  color: active ? "var(--brand-accent)" : "rgba(255,255,255,0.55)",
-                  borderLeft: active ? `3px solid var(--brand-accent)` : "3px solid transparent",
+                  background: active ? "rgba(47, 112, 239, 0.07)" : "transparent",
+                  color: active ? "var(--brand-blue)" : "var(--text-secondary)",
+                  borderLeft: active ? "3px solid var(--brand-blue)" : "3px solid transparent",
                 }}
               >
                 <Icon size={17} />
                 <span>{label}</span>
                 {active && (
-                  <ChevronRight size={14} className="ml-auto opacity-60" />
+                  <ChevronRight size={14} className="ml-auto opacity-50" />
                 )}
               </Link>
             );
@@ -113,7 +115,10 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
         </nav>
 
         {/* Profile footer */}
-        <div className="px-4 py-4 border-t border-white/10">
+        <div
+          className="px-4 py-4 border-t"
+          style={{ borderColor: "var(--border-card)" }}
+        >
           {isLoading ? (
             <div className="flex items-center gap-3">
               <div className="skeleton w-9 h-9 rounded-full" />
@@ -126,15 +131,15 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
             <div className="flex items-center gap-3">
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                style={{ background: "var(--brand-primary)" }}
+                style={{ background: "var(--brand-red)" }}
               >
                 {initials}
               </div>
               <div className="min-w-0">
-                <p className="text-white text-sm font-medium truncate">
+                <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                   {profile?.name ?? "—"}
                 </p>
-                <p className="text-white/40 text-xs truncate">
+                <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>
                   {profile?.accountType === "premium" ? "⭐ Premium" : "Standard"}
                   {joinYear ? ` · since ${joinYear}` : ""}
                 </p>

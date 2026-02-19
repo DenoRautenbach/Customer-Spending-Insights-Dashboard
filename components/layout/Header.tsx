@@ -1,55 +1,24 @@
 "use client";
 
-import { Menu, Moon, Sun } from "lucide-react";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { Menu } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { CustomerProfile } from "@/types/api";
-
-type Period = "7d" | "30d" | "90d" | "1y";
-
-const PERIODS: { label: string; value: Period }[] = [
-  { label: "7D",  value: "7d"  },
-  { label: "30D", value: "30d" },
-  { label: "90D", value: "90d" },
-  { label: "1Y",  value: "1y"  },
-];
 
 interface HeaderProps {
   profile: CustomerProfile | null;
   isLoading?: boolean;
-  period: Period;
-  onPeriodChange: (p: Period) => void;
   onMenuToggle: () => void;
 }
 
-export default function Header({ profile, isLoading, period, onPeriodChange, onMenuToggle }: HeaderProps) {
-  // Always start as false for consistent server/client initial render
-  const [dark, setDark] = useState(false);
-  // Greeting starts empty; set on client only to avoid server/client mismatch
+export default function Header({ profile, isLoading, onMenuToggle }: HeaderProps) {
   const [greeting, setGreeting] = useState("");
 
-  // Apply saved dark-mode preference before first paint (client only)
-  useLayoutEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setDark(true);
-    }
-  }, []);
-
-  // Set time-based greeting on the client only (avoids SSR/CSR mismatch)
   useEffect(() => {
     const hour = new Date().getHours();
     setGreeting(
       hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
     );
   }, []);
-
-  function toggleDark() {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  }
 
   const firstName = profile?.name?.split(" ")[0] ?? null;
   const joinDate = profile?.joinDate
@@ -61,19 +30,25 @@ export default function Header({ profile, isLoading, period, onPeriodChange, onM
 
   return (
     <header
-      className="sticky top-0 z-30 px-4 md:px-6 border-b"
+      className="border-b"
       style={{
-        background: "var(--bg-header)",
+        backgroundImage: "url('/banner.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center 55%",
+        backgroundRepeat: "no-repeat",
         borderColor: "var(--border-subtle)",
       }}
     >
-      {/* Row 1 — always visible: burger (mobile) + greeting */}
-      <div className="flex items-center gap-3 py-3 md:py-4">
+      {/* Semi-transparent frosted overlay — greeting sits on top of the banner */}
+      <div
+        className="flex items-center gap-3 px-4 md:px-6 py-4"
+
+      >
         {/* Burger — mobile only */}
         <button
           onClick={onMenuToggle}
           className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-          style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
+          style={{ background: "rgba(255,255,255,0.6)", color: "var(--text-secondary)" }}
           aria-label="Open navigation"
         >
           <Menu size={18} />
@@ -88,12 +63,15 @@ export default function Header({ profile, isLoading, period, onPeriodChange, onM
             </div>
           ) : (
             <>
-              <h1 className="text-base font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+              <h1
+                className="text-base font-bold truncate"
+                style={{ color: "var(--text-primary)" }}
+              >
                 {greeting}{firstName ? `, ${firstName}` : ""}
                 {profile?.accountType === "premium" && (
                   <span
-                    className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full"
-                    style={{ background: "var(--brand-glow)", color: "var(--brand-accent)" }}
+                    className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style={{ background: "rgba(47,112,239,0.12)", color: "#2F70EF" }}
                   >
                     Premium
                   </span>
@@ -107,81 +85,10 @@ export default function Header({ profile, isLoading, period, onPeriodChange, onM
             </>
           )}
         </div>
-
-        {/* Period selector + dark toggle — inline on md+, hidden here on mobile */}
-        <div className="hidden md:flex items-center gap-3">
-          {/* Period selector */}
-          <div
-            className="flex items-center gap-1 p-1 rounded-xl"
-            style={{ background: "var(--bg-page)" }}
-            role="group"
-            aria-label="Time period selector"
-          >
-            {PERIODS.map(({ label, value }) => (
-              <button
-                key={value}
-                onClick={() => onPeriodChange(value)}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
-                style={{
-                  background: period === value ? "var(--bg-card)" : "transparent",
-                  color: period === value ? "var(--brand-accent)" : "var(--text-muted)",
-                  boxShadow: period === value ? "var(--shadow-card)" : "none",
-                }}
-                aria-pressed={period === value}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* Dark toggle */}
-          <button
-            onClick={toggleDark}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
-            style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
-            aria-label="Toggle dark mode"
-          >
-            {dark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-        </div>
       </div>
 
-      {/* Row 2 — mobile only: period selector + dark toggle */}
-      <div
-        className="flex md:hidden items-center gap-3 pb-3"
-      >
-        <div
-          className="flex items-center gap-1 p-1 rounded-xl flex-1"
-          style={{ background: "var(--bg-page)" }}
-          role="group"
-          aria-label="Time period selector"
-        >
-          {PERIODS.map(({ label, value }) => (
-            <button
-              key={value}
-              onClick={() => onPeriodChange(value)}
-              className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150"
-              style={{
-                background: period === value ? "var(--bg-card)" : "transparent",
-                color: period === value ? "var(--brand-accent)" : "var(--text-muted)",
-                boxShadow: period === value ? "var(--shadow-card)" : "none",
-              }}
-              aria-pressed={period === value}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <button
-          onClick={toggleDark}
-          className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-          style={{ background: "var(--bg-page)", color: "var(--text-secondary)" }}
-          aria-label="Toggle dark mode"
-        >
-          {dark ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
-      </div>
+      {/* Transparent spacer so the banner image is visible below the frosted bar */}
+      <div style={{ height: 200 }} aria-hidden="true" />
     </header>
   );
 }
