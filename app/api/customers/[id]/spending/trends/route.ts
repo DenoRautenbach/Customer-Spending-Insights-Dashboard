@@ -21,6 +21,13 @@ const allTrends: SpendingTrends = {
   ],
 };
 
+const PERIOD_TO_MONTHS: Record<string, number> = {
+  "7d":  1,
+  "30d": 1,
+  "90d": 3,
+  "1y":  12,
+};
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -29,7 +36,10 @@ export async function GET(
   await new Promise((resolve) => setTimeout(resolve, LATENCY));
 
   const { searchParams } = new URL(request.url);
-  const months = Math.min(parseInt(searchParams.get("months") ?? "12", 10), 24);
+  const period = searchParams.get("period");
+  const months = period
+    ? (PERIOD_TO_MONTHS[period] ?? 6)
+    : Math.min(parseInt(searchParams.get("months") ?? "6", 10), 24);
 
   const sliced = allTrends.trends.slice(-months);
   return NextResponse.json({ trends: sliced });

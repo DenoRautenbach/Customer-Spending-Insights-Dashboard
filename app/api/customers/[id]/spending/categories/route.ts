@@ -62,11 +62,34 @@ const mockCategories: SpendingByCategory = {
   ],
 };
 
+// Scale factor per period so amounts reflect the selected time window
+const PERIOD_SCALE: Record<string, number> = {
+  "7d":  7 / 30,
+  "30d": 1,
+  "90d": 3,
+  "1y":  12,
+};
+
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   await params;
   await new Promise((resolve) => setTimeout(resolve, LATENCY));
-  return NextResponse.json(mockCategories);
+
+  const { searchParams } = new URL(request.url);
+  const period = searchParams.get("period") ?? "30d";
+  const scale = PERIOD_SCALE[period] ?? 1;
+
+  const scaled = {
+    ...mockCategories,
+    totalAmount: Math.round(mockCategories.totalAmount * scale),
+    categories: mockCategories.categories.map((c) => ({
+      ...c,
+      amount: Math.round(c.amount * scale * 100) / 100,
+      transactionCount: Math.round(c.transactionCount * scale),
+    })),
+  };
+
+  return NextResponse.json(scaled);
 }

@@ -30,7 +30,7 @@ export function useDashboard(period: Period): DashboardData {
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initial load — fetch everything in parallel
+  // Initial load — fetch everything including period-sensitive data
   useEffect(() => {
     setIsLoading(true);
     setError(null);
@@ -38,8 +38,8 @@ export function useDashboard(period: Period): DashboardData {
     Promise.all([
       fetch(`/api/customers/${CUSTOMER_ID}/profile`).then((r) => r.json()),
       fetch(`/api/customers/${CUSTOMER_ID}/spending/summary?period=${period}`).then((r) => r.json()),
-      fetch(`/api/customers/${CUSTOMER_ID}/spending/categories`).then((r) => r.json()),
-      fetch(`/api/customers/${CUSTOMER_ID}/spending/trends?months=6`).then((r) => r.json()),
+      fetch(`/api/customers/${CUSTOMER_ID}/spending/categories?period=${period}`).then((r) => r.json()),
+      fetch(`/api/customers/${CUSTOMER_ID}/spending/trends?period=${period}`).then((r) => r.json()),
     ])
       .then(([p, s, c, t]) => {
         setProfile(p);
@@ -52,14 +52,21 @@ export function useDashboard(period: Period): DashboardData {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-fetch only summary when period changes (after initial load)
-  const fetchSummary = useCallback(
+  // Re-fetch all period-sensitive data whenever the period filter changes
+  const fetchPeriodData = useCallback(
     (p: Period) => {
       setIsSummaryLoading(true);
-      fetch(`/api/customers/${CUSTOMER_ID}/spending/summary?period=${p}`)
-        .then((r) => r.json())
-        .then(setSummary)
-        .catch(() => setError("Failed to load summary."))
+      Promise.all([
+        fetch(`/api/customers/${CUSTOMER_ID}/spending/summary?period=${p}`).then((r) => r.json()),
+        fetch(`/api/customers/${CUSTOMER_ID}/spending/categories?period=${p}`).then((r) => r.json()),
+        fetch(`/api/customers/${CUSTOMER_ID}/spending/trends?period=${p}`).then((r) => r.json()),
+      ])
+        .then(([s, c, t]) => {
+          setSummary(s);
+          setCategories(c);
+          setTrends(t);
+        })
+        .catch(() => setError("Failed to reload data."))
         .finally(() => setIsSummaryLoading(false));
     },
     []
@@ -67,7 +74,7 @@ export function useDashboard(period: Period): DashboardData {
 
   useEffect(() => {
     if (!isLoading) {
-      fetchSummary(period);
+      fetchPeriodData(period);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period]);

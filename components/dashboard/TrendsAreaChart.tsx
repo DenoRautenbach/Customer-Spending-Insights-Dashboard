@@ -9,11 +9,19 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import type { SpendingTrends } from "@/types/api";
+import type { SpendingTrends, Period } from "@/types/api";
+
+const PERIOD_LABEL: Record<Period, string> = {
+  "7d":  "7-Day",
+  "30d": "30-Day",
+  "90d": "90-Day",
+  "1y":  "Annual",
+};
 
 interface TrendsAreaChartProps {
   data: SpendingTrends | null;
   isLoading: boolean;
+  period?: Period;
 }
 
 function formatMonth(m: string) {
@@ -53,7 +61,7 @@ function CustomTooltip({ active, payload, label }: any) {
   );
 }
 
-export default function TrendsAreaChart({ data, isLoading }: TrendsAreaChartProps) {
+export default function TrendsAreaChart({ data, isLoading, period = "30d" }: TrendsAreaChartProps) {
   const chartData = data?.trends.map((t) => ({
     ...t,
     monthLabel: formatMonth(t.month),
@@ -63,10 +71,10 @@ export default function TrendsAreaChart({ data, isLoading }: TrendsAreaChartProp
     <div className="card p-5 flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
-          Monthly Spending Trends
+          {PERIOD_LABEL[period]} Spending Trends
         </h2>
         <span className="text-xs" style={{ color: "var(--text-muted)" }}>
-          Last {data?.trends.length ?? "—"} months
+          Last {data?.trends.length ?? "—"} data point{data && data.trends.length !== 1 ? "s" : ""}
         </span>
       </div>
 

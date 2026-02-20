@@ -23,7 +23,7 @@ export default function Home() {
 
   const { summary, categories, trends, isLoading, isSummaryLoading } =
     useDashboard(period);
-  const { goals, isLoading: goalsLoading } = useGoals();
+  const { goals, isLoading: goalsLoading } = useGoals(period);
 
   const summaryLoading = isLoading || isSummaryLoading;
 
@@ -82,13 +82,13 @@ export default function Home() {
             <CategoryDonut data={categories} isLoading={isLoading} />
           </div>
           <div className="lg:col-span-3">
-            <TrendsAreaChart data={trends} isLoading={isLoading} />
+            <TrendsAreaChart data={trends} isLoading={isLoading} period={period} />
           </div>
         </div>
 
         {/* Budget Progress */}
         <section id="goals">
-          <BudgetProgress goals={goals} isLoading={goalsLoading} />
+          <BudgetProgress goals={goals} isLoading={goalsLoading} period={period} />
         </section>
 
         {/* Transactions table */}

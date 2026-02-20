@@ -1,6 +1,13 @@
 "use client";
 
-import type { SpendingGoal, GoalStatus } from "@/types/api";
+import type { SpendingGoal, GoalStatus, Period } from "@/types/api";
+
+const PERIOD_LABEL: Record<Period, string> = {
+  "7d":  "7-Day",
+  "30d": "30-Day",
+  "90d": "90-Day",
+  "1y":  "Annual",
+};
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -126,9 +133,10 @@ function GoalRow({ goal }: { goal: SpendingGoal }) {
 interface BudgetProgressProps {
   goals: SpendingGoal[];
   isLoading: boolean;
+  period?: Period;
 }
 
-export default function BudgetProgress({ goals, isLoading }: BudgetProgressProps) {
+export default function BudgetProgress({ goals, isLoading, period = "30d" }: BudgetProgressProps) {
   return (
     <div className="card p-5 space-y-5">
       {/* Header */}
@@ -137,7 +145,7 @@ export default function BudgetProgress({ goals, isLoading }: BudgetProgressProps
           className="text-sm font-bold uppercase tracking-wide"
           style={{ color: "var(--text-primary)" }}
         >
-          Monthly Budget Progress
+          {PERIOD_LABEL[period]} Budget Progress
         </h2>
         {!isLoading && goals.length > 0 && (
           <span className="text-xs" style={{ color: "var(--text-muted)" }}>

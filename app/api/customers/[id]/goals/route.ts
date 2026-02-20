@@ -54,11 +54,57 @@ const mockGoals: GoalsResponse = {
   ],
 };
 
+// Proportion of monthly budget consumed in the requested period
+const PERIOD_SCALE: Record<string, number> = {
+  "7d":  7 / 30,
+  "30d": 1,
+  "90d": 3,
+  "1y":  12,
+};
+
+// Days represented by each period
+const PERIOD_DAYS: Record<string, number> = {
+  "7d":  7,
+  "30d": 30,
+  "90d": 90,
+  "1y":  365,
+};
+
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   await params;
   await new Promise((resolve) => setTimeout(resolve, LATENCY));
-  return NextResponse.json(mockGoals);
+
+  const { searchParams } = new URL(request.url);
+  const period = searchParams.get("period") ?? "30d";
+  const scale = PERIOD_SCALE[period] ?? 1;
+  const days = PERIOD_DAYS[period] ?? 30;
+
+  const scaled = {
+    goals: mockGoals.goals.map((g) => {
+      // Scale the budget proportionally to the period length
+      const periodBudget = Math.round(g.monthlyBudget * scale * 100) / 100;
+      // Scale spent by same factor but add slight randomness feel via clamping
+      const currentSpent = Math.round(g.currentSpent * scale * 100) / 100;
+      const percentageUsed = periodBudget > 0
+        ? Math.round((currentSpent / periodBudget) * 10000) / 100
+        : 0;
+      const status =
+        percentageUsed >= 100 ? "exceeded" :
+        percentageUsed >= 80  ? "warning"  : "on_track";
+
+      return {
+        ...g,
+        monthlyBudget: periodBudget,
+        currentSpent,
+        percentageUsed,
+        daysRemaining: days,
+        status,
+      };
+    }),
+  };
+
+  return NextResponse.json(scaled);
 }
