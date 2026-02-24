@@ -12,6 +12,8 @@ import {
   ChevronRight,
   X,
 } from "lucide-react";
+
+import CurrentDateTime from "../dashboard/CurrentDateTime";
 import type { CustomerProfile } from "@/types/api";
 
 const NAV_ITEMS = [
@@ -137,6 +139,11 @@ export default function Sidebar({ profile, isLoading, isOpen, onClose }: Sidebar
             );
           })}
         </nav>
+
+        {/* Date/Time Widget */}
+        <div className="px-4 py-4">
+          <CurrentDateTime />
+        </div>
 
         {/* Profile footer */}
         <div
